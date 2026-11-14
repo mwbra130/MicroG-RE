@@ -579,6 +579,24 @@
             </intent-filter>
         </activity>
 
+        <!-- Fork addition (mwbra130): phone -> watch account transfer screens.
+             Exported so they can be launched with `am start -n` from ADB/Termux;
+             they expose no data by themselves (export requires a tap inside the
+             app, import only reads a file from this app's private folder). -->
+        <activity
+            android:name="org.microg.gms.auth.transfer.AccountExportActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="Export account for transfer"
+            android:theme="@android:style/Theme.DeviceDefault" />
+
+        <activity
+            android:name="org.microg.gms.auth.transfer.AccountImportActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="Import transferred account"
+            android:theme="@android:style/Theme.DeviceDefault" />
+
         <activity
             android:name="org.microg.gms.auth.AskPermissionActivity"
             android:excludeFromRecents="true"

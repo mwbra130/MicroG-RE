@@ -1,0 +1,56 @@
+name: "Fork build (account transfer)"
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    name: "Build MicroG-RE fork APKs"
+    runs-on: ubuntu-latest
+    env:
+      GRADLE_MICROG_VERSION_WITHOUT_GIT: 1
+
+    steps:
+      - name: "Free disk space"
+        run: |
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /opt/hostedtoolcache/go
+          df -h
+
+      - name: "Checkout sources"
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: "Setup Java"
+        uses: actions/setup-java@v6.0.1
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: "Build armeabi-v7a (watch)"
+        run: |
+          ./gradlew --no-daemon :play-services-core:assembleDefaultRelease -Pabi=armeabi-v7a
+          mkdir -p dist
+          APK=$(ls play-services-core/build/outputs/apk/default/release/*.apk | head -1)
+          echo "Built: $APK"
+          cp "$APK" dist/microg-fork-armeabi-v7a-unsigned.apk
+
+      - name: "Build arm64-v8a (phone)"
+        run: |
+          ./gradlew --no-daemon :play-services-core:assembleDefaultRelease -Pabi=arm64-v8a
+          APK=$(ls play-services-core/build/outputs/apk/default/release/*.apk | head -1)
+          echo "Built: $APK"
+          cp "$APK" dist/microg-fork-arm64-v8a-unsigned.apk
+
+      - name: "Upload APKs"
+        uses: actions/upload-artifact@v7
+        with:
+          name: microg-fork-apks
+          path: "dist/*.apk"
+          if-no-files-found: error
