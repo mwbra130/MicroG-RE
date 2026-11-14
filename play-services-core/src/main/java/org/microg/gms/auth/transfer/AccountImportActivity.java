@@ -167,7 +167,7 @@ public class AccountImportActivity extends Activity {
 
         boolean checkinOk;
         try {
-            checkinOk = CheckinManager.checkin(this, true);
+            checkinOk = CheckinManager.checkin(this, true) != null;
         } catch (Exception e) {
             checkinOk = false;
         }
